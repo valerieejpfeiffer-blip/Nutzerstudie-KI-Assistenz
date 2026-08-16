@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutzerstudie: KI-Assistenz für Gesetze</title>
+  <script async src="https://tally.so/widgets/embed.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f4ef;
+      --ink: #18181b;
+      --ink-soft: #5b5b60;
+      --accent: #18181b;
+      --yellow: #fce29b;
+      --rule: #e2e0d8;
+      --c1: #eef0d0; --c1-b: #c9d46a; --c1-t: #5a5f1f;
+      --c2: #f0eac9; --c2-b: #d9c766; --c2-t: #6b5a1a;
+      --c3: #c3d4ba; --c3-b: #7a9e6e; --c3-t: #33472c;
+      --c4: #dcefd2; --c4-b: #8fc97a; --c4-t: #2c5a1f;
+      --c5: #bfe1ec; --c5-b: #4fa8c0; --c5-t: #1c4a58;
+      --c6: #ddb0ee; --c6-b: #b15fe0; --c6-t: #5c1f78;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      font-family: 'Hanken Grotesk', Arial, sans-serif;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 36px 18px 60px;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.65;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 480px;
+      height: 320px;
+      max-width: 140vw;
+      background:
+        radial-gradient(circle at 20% 30%, var(--c5) 0%, transparent 55%),
+        radial-gradient(circle at 75% 25%, var(--c6) 0%, transparent 55%),
+        radial-gradient(circle at 50% 70%, var(--c4) 0%, transparent 55%);
+      filter: blur(38px);
+      opacity: 0.55;
+      z-index: 0;
+      pointer-events: none;
+    }
+    header, .page, .progress {
+      position: relative;
+      z-index: 1;
+    }
+    .mobile-notice {
+      background: rgba(79, 168, 192, 0.15);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border-radius: 4px;
+      border-left: 4px solid var(--c5-b);
+      margin-bottom: 20px;
+    }
+    .eyebrow {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 14px;
+      display: inline-block;
+      padding: 4px 10px 4px 0;
+      border-bottom: 4px solid var(--yellow);
+    }
+    h1 {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 30px;
+      line-height: 1.08;
+      margin: 0 0 28px;
+      letter-spacing: -0.03em;
+    }
+    /* Fortschritts-Punkte */
+    .progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .dot {
+      height: 6px;
+      flex: 1;
+      border-radius: 999px;
+      background: var(--rule);
+      transition: background 0.25s ease;
+    }
+    .dot.active { background: var(--dot-color, var(--ink)); }
+    .dot.visited { background: var(--dot-color, var(--ink)); opacity: 0.4; }
+
+    /* Seiten */
+    .page {
+      display: none;
+      animation: fade-up 0.35s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .page { animation: none; }
+    }
+
+    .page-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    h2 {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 21px;
+      margin: 0 0 12px;
+      letter-spacing: -0.01em;
+    }
+    p { margin: 0 0 16px; color: var(--ink-soft); font-size: 15px; }
+    .ds-block {
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+    }
+    .ds-block:first-of-type {
+      padding-top: 0;
+      border-top: none;
+    }
+    .ds-block p:last-child {
+      margin-bottom: 16px;
+    }
+    p:last-child { margin-bottom: 0; }
+    .mini-heading {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mini-heading::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--ink-soft);
+      flex-shrink: 0;
+    }
+    p.mini-heading + p {
+      margin-top: 0;
+    }
+    strong { color: var(--ink); font-weight: 600; }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .step-row {
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+    }
+    .step-row:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+    .step-row p:last-child {
+      margin-bottom: 0;
+    }
+    .howto-toggle summary {
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      list-style: none;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .howto-toggle summary::marker {
+      content: none;
+    }
+    .howto-toggle summary::-moz-list-bullet {
+      list-style-type: none;
+    }
+    .howto-toggle summary::before {
+      content: "▸";
+      display: inline-block;
+      color: var(--c5-b);
+      font-size: 10px;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    .howto-toggle[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .howto-toggle summary::-webkit-details-marker {
+      display: none;
+    }
+    .howto-toggle summary:hover {
+      color: var(--ink);
+    }
+    .howto-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .howto-option {
+      flex: 1;
+      min-width: 130px;
+      background: rgba(24,24,27,0.03);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    .howto-option img {
+      margin: 0 0 6px;
+    }
+    .howto-option span {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .reassurance {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--ink-soft);
+      background: rgba(24,24,27,0.03);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 6px;
+      margin-bottom: 18px;
+    }
+    .anleitung-box {
+      background: rgba(24,24,27,0.02);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .sub-heading {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 0 0 10px;
+    }
+    .howto-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--rule);
+      margin: 10px 0 14px;
+    }
+    .howto-image-small {
+      max-width: 60px;
+    }
+
+    p.lead {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .time-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+    .time-badge::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--ink-soft);
+      flex-shrink: 0;
+    }
+    .mini-guide-box {
+      background: rgba(24,24,27,0.03);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .mini-guide-box summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mini-guide-box summary::-webkit-details-marker {
+      display: none;
+    }
+    .mini-guide-box summary.mini-heading::before {
+      content: none;
+    }
+    .pretest-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+    .pretest-list li {
+      margin-bottom: 4px;
+    }
+    .pretest-list li:last-child {
+      margin-bottom: 0;
+    }
+    .mini-guide-subtitle {
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-style: italic;
+      margin: 6px 0 0;
+    }
+    .mini-guide-box > summary::after {
+      content: "▾";
+      color: var(--c3-b);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+    .mini-guide-box[open] > summary::after {
+      transform: rotate(180deg);
+    }
+    .mini-guide-box .mini-guide {
+      margin-top: 10px;
+    }
+    .mini-guide {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .mini-guide span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .mini-guide span::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--ink-soft);
+      flex-shrink: 0;
+    }
+    .fixed-bottom-bar {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+      background: linear-gradient(to top, var(--bg) 60%, transparent);
+      z-index: 40;
+    }
+    .fixed-bottom-bar.visible {
+      display: block;
+    }
+    .fixed-bottom-bar .nav-button {
+      max-width: 604px;
+      margin: 0 auto;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+
+    .frame-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--rule);
+      margin-top: 6px;
+    }
+    iframe {
+      width: 100%;
+      border: none;
+      display: block;
+      min-height: 400px;
+    }
+
+    .nav-button, .popup-button {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--yellow);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .nav-button:hover, .popup-button:hover { background: #f7d271; transform: translateY(-1px); }
+    .nav-button:focus-visible, .popup-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--ink-soft);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .back-link:hover { color: var(--ink); }
+    .secondary-button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      background: transparent;
+      border: 1.5px solid var(--rule);
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .secondary-button:hover {
+      background: rgba(24,24,27,0.04);
+      border-color: var(--ink-soft);
+    }
+    .secondary-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Erinnerungs-Popup */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(24,24,27,0.45);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg);
+      border-radius: 18px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      animation: pop-in 0.25s ease;
+    }
+    @keyframes pop-in {
+      from { opacity: 0; transform: scale(0.96) translateY(4px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .modal-card { animation: none; }
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: var(--yellow);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .nav-button:disabled {
+      background: var(--rule);
+      color: var(--ink-soft);
+      cursor: not-allowed;
+    }
+
+    @media (min-width: 700px) {
+      body { padding: 56px 20px 80px; }
+      h1 { font-size: 32px; }
+      iframe { min-height: 600px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="eyebrow">Nutzerstudie &middot; Masterarbeit</div>
+  <h1>Nutzerstudie: KI-Assistenz für Gesetze</h1>
+  <div class="mobile-notice">📱 Bitte nutze für diese Umfrage dein Smartphone.</div>
+
+  <div class="progress" id="progress"></div>
+
+  <!-- ================= Seite 1: Willkommen ================= -->
+  <section class="page active" data-page="1" style="--dot-color: var(--c1-b)">
+    <div class="page-label" style="background: var(--c1); border-color: var(--c1-b); color: var(--c1-t)">1</div>
+    <h2>Willkommen</h2>
+    <p class="lead">Danke, dass du dir Zeit nimmst!</p>
+    <p>Du nutzt gleich eine KI-Assistenz, die neue Gesetze erklärt. Im Anschluss beantwortest du noch ein paar Fragen zu deiner Erfahrung damit &ndash; es geht dabei nicht um Wissen oder Inhalte, sondern nur um deinen Eindruck.</p>
+    <span class="time-badge">ca. 10-15 Minuten</span>
+    <button class="nav-button" onclick="goTo(2)">Weiter</button>
+  </section>
+
+  <!-- ================= Seite 2: Datenschutz ================= -->
+  <section class="page datenschutz-page" data-page="2" style="--dot-color: var(--c2-b)">
+    <div class="page-label" style="background: var(--c2); border-color: var(--c2-b); color: var(--c2-t)">2</div>
+    <h2>Infos zum Datenschutz</h2>
+    <div class="anleitung-box">
+      <div class="ds-block">
+        <p class="mini-heading">Wer und wofür</p>
+        <p>Ich bin Valerie Pfeiffer, Masterandin an der Hochschule für Angewandte Wissenschaften Hamburg. Deine Angaben nutze ich nur für diese Masterarbeit &ndash; dort stelle ich alle Daten anonymisiert dar.</p>
+      </div>
+      <div class="ds-block">
+        <p class="mini-heading">Deine Kontaktdaten & Rechte</p>
+        <p>Deine Kontaktdaten nutze ich ausschließlich für ein mögliches, freiwilliges Nachgespräch. Deine Teilnahme insgesamt ist freiwillig, du kannst sie jederzeit abbrechen und die Löschung deiner Daten verlangen (valerie.pfeiffer@haw-hamburg.de).</p>
+      </div>
+      <div class="ds-block">
+        <p class="mini-heading">Speicherdauer</p>
+        <p>Deine Daten werden bis zum Abschluss der Arbeit gespeichert. Die Zustimmung dazu bestätigst du als erste Frage in einem Formular am Ende der Befragung.</p>
+      </div>
+    </div>
+    <button class="nav-button" onclick="goTo(3)">Weiter</button>
+    <button class="back-link" onclick="goTo(1)">Zurück</button>
+  </section>
+
+  <!-- ================= Seite 3: So gehst du vor ================= -->
+  <section class="page" data-page="3" style="--dot-color: var(--c3-b)">
+    <div class="page-label" style="background: var(--c3); border-color: var(--c3-b); color: var(--c3-t)">3</div>
+    <h2>So gehst du vor</h2>
+    <p>Du siehst gleich ein Chat-Fenster: eine KI, die dir neue Gesetze erklärt.</p>
+    <p class="mobile-notice">Das hier ist nur, um dir einen kurzen Überblick zu geben. Direkt über dem Chatfenster auf der nächsten Seite kannst du die Anleitung auch nochmal ausklappen.</p>
+    <div class="anleitung-box">
+      <h3 class="sub-heading">Anleitung</h3>
+      <div class="step-list">
+        <div class="step-row">
+          <p class="mini-heading">Schritt 1</p>
+          <p>Wähle eines der vorgegebenen Themen aus.</p>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 2</p>
+          <p>Klicke auf „KI-Assistenz starten“ und stimme den Nutzungsbedingungen zu.</p>
+          <details class="howto-toggle">
+            <summary>Wo genau ist der Button?</summary>
+            <div class="howto-options">
+              <div class="howto-option">
+                <img src="images/button-ki-assistenz.png" alt="KI-Assistenz starten Button" class="howto-image">
+                <span>Unten links auf der Seite</span>
+              </div>
+              <div class="howto-option">
+                <img src="images/menu-icon.png" alt="Menü-Symbol oben links" class="howto-image howto-image-small">
+                <span>Über das Menü, dann „Chatten mit KI-Assistenz“</span>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 3</p>
+          <p>Frag einfach drauflos. Du kannst mit der KI schreiben oder sprechen. Es gibt kein richtig oder falsch, und kein bestimmtes Zeitlimit.</p>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 4</p>
+          <p><strong>Ganz wichtig:</strong> Bitte lade am Ende der KI-Interaktion dein Chatprotokoll herunter.</p>
+          <details class="howto-toggle">
+            <summary>Wo genau ist der Button?</summary>
+            <p>Unten in der Anwendung, mittig.</p>
+            <img src="images/button-download.png" alt="Gespraech als Text herunterladen Button" class="howto-image">
+          </details>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 5</p>
+          <p>Beantworte die Fragen im Umfrageformular.</p>
+        </div>
+      </div>
+    </div>
+    <button class="nav-button" onclick="goTo(4)">Los geht's</button>
+    <button class="back-link" onclick="goTo(2)">Zurück</button>
+  </section>
+
+  <!-- ================= Seite 4: Chatbot ================= -->
+  <section class="page" data-page="4" style="--dot-color: var(--c4-b); padding-bottom: 80px;">
+    <div class="page-label" style="background: var(--c4); border-color: var(--c4-b); color: var(--c4-t)">4</div>
+    <h2>Chatbot ausprobieren</h2>
+    <details class="mini-guide-box">
+      <summary class="mini-heading">Anleitung</summary>
+      <div class="step-list">
+        <div class="step-row">
+          <p class="mini-heading">Schritt 1</p>
+          <p>Wähle eines der vorgegebenen Themen aus.</p>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 2</p>
+          <p>Klicke auf „KI-Assistenz starten“ und stimme den Nutzungsbedingungen zu.</p>
+          <details class="howto-toggle">
+            <summary>Wo genau ist der Button?</summary>
+            <div class="howto-options">
+              <div class="howto-option">
+                <img src="images/button-ki-assistenz.png" alt="KI-Assistenz starten Button" class="howto-image">
+                <span>Unten links auf der Seite</span>
+              </div>
+              <div class="howto-option">
+                <img src="images/menu-icon.png" alt="Menü-Symbol oben links" class="howto-image howto-image-small">
+                <span>Über das Menü, dann „Chatten mit KI-Assistenz“</span>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 3</p>
+          <p>Frag einfach drauflos. Du kannst mit der KI schreiben oder sprechen. Es gibt kein richtig oder falsch, und kein bestimmtes Zeitlimit.</p>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 4</p>
+          <p><strong>Ganz wichtig:</strong> Bitte lade am Ende der KI-Interaktion dein Chatprotokoll herunter.</p>
+          <details class="howto-toggle">
+            <summary>Wo genau ist der Button?</summary>
+            <p>Unten in der Anwendung, mittig.</p>
+            <img src="images/button-download.png" alt="Gespraech als Text herunterladen Button" class="howto-image">
+          </details>
+        </div>
+        <div class="step-row">
+          <p class="mini-heading">Schritt 5</p>
+          <p>Beantworte die Fragen im Umfrageformular.</p>
+        </div>
+      </div>
+    </details>
+    <div class="frame-wrap">
+      <iframe
+        id="chatbotFrame"
+        src="https://wasgehtmichdasan.wdr.de"
+        allow="microphone; camera; autoplay"
+        title="Chatbot">
+      </iframe>
+    </div>
+  </section>
+
+  <div class="fixed-bottom-bar">
+    <button class="nav-button" onclick="openReminder()">Ich bin fertig mit dem Chatbot</button>
+  </div>
+
+  <!-- ================= Seite 5: Formular ================= -->
+  <section class="page" data-page="5" style="--dot-color: var(--c6-b)">
+    <div class="page-label" style="background: var(--c6); border-color: var(--c6-b); color: var(--c6-t)">5</div>
+    <div id="formularVorher">
+      <h2>Formular ausfüllen</h2>
+      <p>Klicke auf den Button, um das Formular zu öffnen. Dort findest du auch die restlichen Fragen zu deiner Erfahrung.</p>
+      <button
+        class="popup-button"
+        data-tally-open="ODZB2k"
+        data-tally-layout="modal"
+        data-tally-width="700"
+        data-tally-auto-close="3000">
+        Formular ausfüllen
+      </button>
+      <button class="back-link" onclick="goTo(4)">Zurück</button>
+    </div>
+    <div id="formularFertig" style="display: none;">
+      <h2>Geschafft! 🎉</h2>
+      <p>Ganz herzlichen Dank, dass du dir die Zeit genommen und mitgemacht hast &ndash; das hilft mir wirklich sehr für meine Masterarbeit.</p>
+      <p>Deine Antworten sind angekommen. Du kannst diese Seite jetzt einfach schließen.</p>
+      <p style="font-size: 14px; color: var(--ink-soft);">Ich wünsche dir noch einen schönen Tag!</p>
+    </div>
+  </section>
+
+  <!-- ================= Erinnerungs-Popup ================= -->
+  <!-- ================= Pretest-Popup ================= -->
+  <div class="modal-backdrop open" id="pretestBackdrop">
+    <div class="modal-card">
+      <div class="page-label" style="background: var(--c5); border-color: var(--c5-b); color: var(--c5-t)">👋</div>
+      <h2>Hey!</h2>
+      <p>Ich schreibe gerade an meiner Masterarbeit und teste dafür eine KI-Assistenz, die neue Gesetze erklärt.</p>
+      <p>Das hier ist noch ein Pretest, bevor die eigentliche Befragung startet &ndash; ich würde mich sehr freuen, wenn du mitmachst.</p>
+      <p><strong>Es wäre toll, wenn du bis Montagabend, 17. August, dazu kommst.</strong></p>
+      <p class="mini-heading">Worauf es besonders ankommt</p>
+      <ul class="pretest-list">
+        <li>Verständlichkeit der Anleitung</li>
+        <li>Unklares oder Fehlerhaftes</li>
+        <li>Technische Funktion (Chatbot, Mikrofon, Download, Formular)</li>
+        <li>Ob die Zeitangabe realistisch ist</li>
+        <li>Verständlichkeit der Fragen im Formular</li>
+        <li>Gerät/Browser, auf dem du unterwegs bist</li>
+      </ul>
+      <button class="nav-button" onclick="document.getElementById('pretestBackdrop').classList.remove('open')">Alles klar!</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="reminderBackdrop">
+    <div class="modal-card">
+      <div class="page-label" style="background: var(--c5); border-color: var(--c5-b); color: var(--c5-t)">!</div>
+      <h2>Bevor es weitergeht</h2>
+      <p class="mobile-notice">Nutze im Chatbot das Herunterladen-Symbol, um dein Gespräch als Datei zu sichern. Die Datei brauchst du gleich für das Formular.</p>
+      <p style="font-size: 13px; font-style: italic; color: var(--ink-soft);">Die KI kann eventuell noch ein paar Sekunden nachsprechen, das ist normal &ndash; du brauchst darauf nicht zu reagieren.</p>
+      <label class="checkbox-row">
+        <input type="checkbox" id="downloadCheckbox" onchange="toggleContinueButton()">
+        <span>Ja, ich habe das Chatprotokoll heruntergeladen.</span>
+      </label>
+      <button class="nav-button" id="continueButton" onclick="closeReminder(true)" disabled>Weiter zum Formular</button>
+      <button class="secondary-button" onclick="closeReminder(false)">Zurück zum Chatbot</button>
+    </div>
+  </div>
+
+  <script>
+    const totalPages = 5;
+
+    function buildProgress() {
+      const container = document.getElementById('progress');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.dataset.dot = i;
+        container.appendChild(dot);
+      }
+    }
+
+    function goTo(pageNum) {
+      document.querySelectorAll('.page').forEach(p => {
+        p.classList.toggle('active', parseInt(p.dataset.page) === pageNum);
+      });
+      document.querySelectorAll('.dot').forEach(d => {
+        const n = parseInt(d.dataset.dot);
+        d.classList.toggle('active', n === pageNum);
+        d.classList.toggle('visited', n < pageNum);
+        if (n === pageNum) {
+          const activePage = document.querySelector('.page[data-page="' + pageNum + '"]');
+          d.style.setProperty('--dot-color', getComputedStyle(activePage).getPropertyValue('--dot-color'));
+        }
+      });
+      document.querySelector('.fixed-bottom-bar').classList.toggle('visible', pageNum === 4);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (pageNum === 4) {
+        // kurze Verzögerung, damit die Seite erst fertig gescrollt/
+        // gerendert ist, bevor wir die verfügbare Höhe messen
+        setTimeout(sizeChatbotFrame, 50);
+      }
+    }
+
+    function sizeChatbotFrame() {
+      const iframe = document.getElementById('chatbotFrame');
+      const wrap = iframe.closest('.frame-wrap');
+      if (!wrap) return;
+      const rect = wrap.getBoundingClientRect();
+      const reserveBelow = 100; // Platz fuer "Ich bin fertig"-Button + Zurueck-Link
+      const available = window.innerHeight - rect.top - reserveBelow;
+      iframe.style.height = Math.max(400, available) + 'px';
+    }
+
+    window.addEventListener('resize', () => {
+      const page4 = document.querySelector('.page[data-page="4"]');
+      if (page4 && page4.classList.contains('active')) {
+        sizeChatbotFrame();
+      }
+    });
+
+    const guideBox = document.querySelector('.page[data-page="4"] .mini-guide-box');
+    if (guideBox) {
+      guideBox.addEventListener('toggle', () => {
+        setTimeout(sizeChatbotFrame, 50);
+      });
+    }
+
+    const chatbotSrc = "https://wasgehtmichdasan.wdr.de";
+
+    function stopChatbotFrame() {
+      document.getElementById('chatbotFrame').src = 'about:blank';
+    }
+
+    function startChatbotFrame() {
+      document.getElementById('chatbotFrame').src = chatbotSrc;
+    }
+
+    function openReminder() {
+      document.getElementById('reminderBackdrop').classList.add('open');
+    }
+
+    function toggleContinueButton() {
+      const checked = document.getElementById('downloadCheckbox').checked;
+      document.getElementById('continueButton').disabled = !checked;
+    }
+
+    function closeReminder(proceed) {
+      document.getElementById('reminderBackdrop').classList.remove('open');
+      if (proceed) {
+        // Erst JETZT, nachdem der Download bestätigt wurde, die
+        // Chatbot-Verbindung (inkl. Mikrofon) wirklich beenden.
+        stopChatbotFrame();
+        goTo(5);
+      }
+    }
+
+    window.addEventListener('message', function(event) {
+      if (event.origin !== 'https://tally.so') return;
+      if (event.data && event.data.event === 'Tally.FormSubmitted') {
+        document.getElementById('formularVorher').style.display = 'none';
+        document.getElementById('formularFertig').style.display = 'block';
+      }
+    });
+
+    buildProgress();
+    goTo(1);
+  </script>
+
+</body>
+</html>
